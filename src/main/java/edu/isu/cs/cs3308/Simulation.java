@@ -25,6 +25,9 @@ public class Simulation {
 
     // You will probably need more fields
 
+    /**
+     * Adds the value 0(signifying 0 time in the line) to the shortest line available or the first line if they are all equal.
+     */
     public void addToShortest(){
         LinkedQueue shortest = queueArray.get(0);
         for(LinkedQueue curr: queueArray){
@@ -33,14 +36,20 @@ public class Simulation {
          shortest.offer(0);
     }
 
+    /**
+     * Takes all the values stored in the waitTimes list and calculates an overall average by emptying the list so it is ready for the next iteration.
+     * @return int (average wait time)
+     */
     public int calcAvgWaitTime(){
         int totalNumOfPeople = waitTimes.size();
         int totalWait = 0;
         for(int i = 0; i < waitTimes.size(); i++) {totalWait += (int)waitTimes.removeFirst();}
-        int averageWait = totalWait / totalNumOfPeople;
-        return averageWait;
+        return totalWait / totalNumOfPeople;
     }
 
+    /**
+     * Iterates through all the time values stored in the queueArray and increments by one.
+     */
     public void updateQueueTimes(){
         for(LinkedQueue current: queueArray){
             int counter = 0;
@@ -51,6 +60,9 @@ public class Simulation {
         }
     }
 
+    /**
+     * Iterates through 720 minutes of new people arriving, being assigned to lines, and two people from each line getting out and recording the final time to waitTimes
+     */
     public void updateNewMinute(){
         int counter = 0;
         while(counter < 720) {
@@ -85,7 +97,6 @@ public class Simulation {
 
             System.out.printf("Average wait time using %d queue(s): %d\n", i, averageWait);
             queueArray.clear();
-
         }
     }
 
