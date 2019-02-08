@@ -43,7 +43,8 @@ public class Simulation {
     public int calcAvgWaitTime(){
         int totalNumOfPeople = waitTimes.size();
         int totalWait = 0;
-        for(int i = 0; i < waitTimes.size(); i++) {totalWait += (int)waitTimes.removeFirst();}
+        while(!waitTimes.isEmpty()) {
+            totalWait += (int)waitTimes.removeFirst();}
         return totalWait / totalNumOfPeople;
     }
 
@@ -84,7 +85,7 @@ public class Simulation {
      * Executes the Simulation
      */
     public void runSimulation() {
-        System.out.printf("Arrival rate: %d\n", arrivalRate);
+        System.out.printf("Arrival rate: %d\r\n", arrivalRate);
 
         for(int i = 1; i <= maxNumQueues; i++){
             int counter = 0;
@@ -95,7 +96,7 @@ public class Simulation {
             }
             int averageWait = calcAvgWaitTime();
 
-            System.out.printf("Average wait time using %d queue(s): %d\n", i, averageWait);
+            System.out.printf("Average wait time using %d queue(s): %d\r\n", i, averageWait);
             queueArray.clear();
         }
     }
