@@ -1,5 +1,6 @@
 package edu.isu.cs.cs3308;
 
+import edu.isu.cs.cs3308.structures.List;
 import edu.isu.cs.cs3308.structures.impl.LinkedQueue;
 import edu.isu.cs.cs3308.structures.impl.SinglyLinkedList;
 
@@ -19,8 +20,9 @@ public class Simulation {
     private Random r;
     private int numIterations = 50;
     private int minutesPassed = 0;
-    ArrayList<LinkedQueue> queueArray = new ArrayList<LinkedQueue>();
-    SinglyLinkedList<Integer> waitTimes = new SinglyLinkedList<>();
+    private static ArrayList<LinkedQueue> queueArray;
+    public static SinglyLinkedList waitTimes = new SinglyLinkedList();
+
     // You will probably need more fields
 
     public void addToShortest(){
@@ -31,10 +33,11 @@ public class Simulation {
          shortest.offer(0);
     }
 
-    public int calcAvgWaitTime(LinkedQueue currQueue){
-        int averageWait = 0;
-
-        //TODO: Take in the currQueue and average all of the values
+    public int calcAvgWaitTime(){
+        int totalNumOfPeople = waitTimes.size();
+        int totalWait = 0;
+        for(int i = 0; i < waitTimes.size(); i++) {totalWait += (int)waitTimes.removeFirst();}
+        int averageWait = totalWait / totalNumOfPeople;
         return averageWait;
     }
 
@@ -48,15 +51,20 @@ public class Simulation {
         }
     }
 
-    public void updateNewMinute(int counter){
-        if(counter == 720) return;
-        int newArrivals = getRandomNumPeople(arrivalRate);
-        while(newArrivals != 0){
-            addToShortest();
-        }
-        for(LinkedQueue current: queueArray){
-            waitTimes.addFirst((int)current.poll());
-            waitTimes.addFirst((int)current.poll());
+    public void updateNewMinute(){
+        int counter = 0;
+        while(counter < 720) {
+            int newArrivals = getRandomNumPeople(arrivalRate);
+            while (newArrivals != 0) {
+                addToShortest();
+                newArrivals--;
+            }
+            for (LinkedQueue current : queueArray) {
+                waitTimes.addFirst(current.poll());
+                waitTimes.addFirst(current.poll());
+            }
+            updateQueueTimes();
+            counter++;
         }
     }
 
@@ -64,12 +72,21 @@ public class Simulation {
      * Executes the Simulation
      */
     public void runSimulation() {
+        System.out.printf("Arrival rate: %d\n", arrivalRate);
 
+        for(int i = 1; i <= maxNumQueues; i++){
+            int counter = 0;
+            while(counter < 50) {
+                Simulation currSim = new Simulation(arrivalRate, i);
+                currSim.updateNewMinute();
+                counter++;
+            }
+            int averageWait = calcAvgWaitTime();
 
+            System.out.printf("Average wait time using %d queue(s): %d\n", i, averageWait);
+            queueArray.clear();
 
-
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        }
     }
 
     /**
@@ -85,17 +102,16 @@ public class Simulation {
         this.arrivalRate = arrivalRate;
         this.maxNumQueues = maxNumQueues;
         r = new Random();
-
-        int tempMaxNumQueues = maxNumQueues;
+        queueArray = new ArrayList<>();
+        int tempMaxNumQueues = this.maxNumQueues;
         while(tempMaxNumQueues != 0){
             queueArray.add(new LinkedQueue());
             tempMaxNumQueues--;
         }
-
     }
 
     /**
-     * Constructs a new siulation with the given arrival rate and maximum number of queues. The Random
+     * Constructs a new situation with the given arrival rate and maximum number of queues. The Random
      * number generator is seeded with the provided seed value, and the number of iterations is set to
      * the provided value.
      *
@@ -108,6 +124,13 @@ public class Simulation {
         this(arrivalRate, maxNumQueues);
         r = new Random(seed);
         this.numIterations = numIterations;
+
+        queueArray = new ArrayList<>();
+        int tempMaxNumQueues = this.maxNumQueues;
+        while(tempMaxNumQueues != 0) {
+            queueArray.add(new LinkedQueue());
+            tempMaxNumQueues--;
+        }
     }
 
     /**
